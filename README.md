@@ -1,3 +1,44 @@
+# Fork for FLSUN Q5 (stock)
+
+NOTE: This is a fork just for maintaining configurations. There will certainly never be any code changes. USE THIS CONFIGURATION AT YOUR OWN RISK!
+
+## Description
+
+This configuration is based on Q5_nano_v1 taken from the example configurations. If you want to start off from the beginning, keep in mind to use the corresponding branches otherwise your build will fail in the best case or behave strangely. So if you use the bugfix branch for Marlin also use the bugfix branch for the configurations.
+
+I did some minor configuration tweaks to get the touch screen going. I went for the Classic UI, as the color UI is nice but somehow not reliable to use on the Q5's small touch screen.
+
+There are also custom E-Steps und some other specifics that may not apply to your printer. So please carefully review and understand the settings to avoid damage.
+
+### Calibration
+
+Most challenging was to half-way match the calibration procedure of the original firmware. While the calibration can be triggered by the corresponding menu item the neccessary adjustment of the probe offset is a very manual process. To the rescue comes the Probe Offset Wizard that can be enabled. The calibration process would then roughly resemble the one in the original firmware.
+There is however one major problem: When using the Wizard it does not disable soft endstops so you cannot adjust z below zero. I have filed a bug for it (https://github.com/MarlinFirmware/Marlin/issues/20848)
+
+But there is a workaround by manually setting M211 S0 and/or by enabling a corresponing menu item in the firmware und using that for triggering soft endstops. Be careful what you do as there is good chance to crash the nozzle into the bed by accident when using the touch screen! Also note NOZZLE_TO_PROBE_OFFSET setting in configuration.h. Default is -18 and should be save for a stock printer. -19.75 reduces the distance between nozzle and bed. This is the setting that must be ajusted after auto calibration.
+
+The entire calibration now works as follows (at least for me):
+
+1. Start the calibration process (config/delta calibration/auto calibration) with the probe mounted. This takes pretty long compared to the original firmware as Marlin goes through seven iterations when doing it for the first time
+2. When finished, store settings
+3. Disable soft endstops
+4. Start the Probe Offset Wizard (advanced settings) still with the probe mounted
+5. Remove the probe (be careful not to move the print head)
+6. Dial in the probe z offset using paper or feeler gauge or something
+7. When finished, store settings
+8. Enable soft endstops
+9. The new probe z offset should be now visible in both the configuration and advanced settings/probe offset
+
+To double check, Home axis and then move z to zero.
+
+### Futher problems
+
+I noticed that the touch screen freezes when using "Restore Defaults" or sending GCODE M502. I filed a bug for that as well: https://github.com/MarlinFirmware/Marlin/issues/20849
+
+
+
+
+
 # Marlin 3D Printer Firmware
 
 ![GitHub](https://img.shields.io/github/license/marlinfirmware/marlin.svg)
