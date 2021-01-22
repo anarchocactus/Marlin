@@ -1,6 +1,6 @@
 # Fork for FLSUN Q5 (stock)
 
-NOTE: This is a fork just for maintaining configurations. There will certainly never be any code changes. USE THIS CONFIGURATION AT YOUR OWN RISK!
+NOTE and DISCLAIMER: This is a fork just for maintaining configurations. There will most certainly never be any code changes. USE THIS CONFIGURATION AT YOUR OWN RISK!
 
 ## Description
 
@@ -8,7 +8,7 @@ This configuration is based on Q5_nano_v1 taken from the example configurations.
 
 I did some minor configuration tweaks to get the touch screen going. I went for the Classic UI, as the color UI is nice but somehow not reliable to use on the Q5's small touch screen.
 
-There are also custom E-Steps und some other specifics that may not apply to your printer. So please carefully review and understand the settings to avoid damage.
+There are also custom E-Steps and maybe some other specifics that may not apply to your printer. So please carefully review and understand the settings to avoid damage. If in doubt make a diff against the example configuration mentioned above. As for now there should be no problems when using this configuration as-is. But always mind the disclaimer!
 
 ### Calibration
 
@@ -23,7 +23,7 @@ The entire calibration now works as follows (at least for me):
 2. When finished, store settings
 3. Disable soft endstops
 4. Start the Probe Offset Wizard (advanced settings) still with the probe mounted
-5. Remove the probe (be careful not to move the print head)
+5. Remove the probe after z reference probing (be careful not to move the print head)
 6. Dial in the probe z offset using paper or feeler gauge or something
 7. When finished, store settings
 8. Enable soft endstops
