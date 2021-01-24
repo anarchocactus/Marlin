@@ -21,7 +21,7 @@ There are also custom E-Steps and maybe some other specifics that may not apply 
 
 ### Calibration
 
-Calibration is something FLSUN has not provided for in their LCD menu. For the noral user they rather appear to rely on the values that are manually configurable in the robin_nano_config file or even hard-coded defaults in the firmware. The first steps instructions do not trigger calibration but rather auto-leveling which is a difference.
+Calibration is something FLSUN has not provided for in their LCD menu. For the "normal" user they rather appear to rely on the values that are manually configurable in the robin_nano_config file or even hard-coded defaults in the firmware. The first steps instructions do not trigger calibration but rather auto-leveling. This a difference and can be easily confused, as it happened to me as I had no experience with Delta printers before.
 
 While the calibration can be triggered by the corresponding menu item the neccessary adjustment of the probe offset is a very manual process. To the rescue comes the Probe Offset Wizard that can be enabled. The calibration process would then roughly resemble the one in the original firmware.
 There is however one major problem: When using the Wizard it does not disable soft endstops so you cannot adjust z below zero. I have filed a bug for it (https://github.com/MarlinFirmware/Marlin/issues/20848)
