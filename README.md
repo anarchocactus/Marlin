@@ -50,7 +50,7 @@ First tests show that bilinear leveling is working well but UBL does not. I will
 
 With stock settings I could not get a stable temperature on the nozzle. It was over- and undershooting by about 5 to 10&deg;C even after numerous attempts of PID tuning. This is also the case with the original firmware. I did experiments with some values of PID_FUNCTIONAL_RANGE but larger values than the default of 10 only gave me more over-/undershoot apparently due to integral windup as explained here: https://reprap.org/forum/read.php?4,369867
 
-After some more research and experiments I ended up with lowering PID_MAX (BAG_MAX) from 255 to 150 follwed by PID tuning. The overshoot has vanished only leaving a small amount of undershoot at the beginning at the cost of some increased heating time. This is still not what I experienced with my Ender 3 Pro which has a much uncomplicated PID behaviour.
+After some more research and experiments I ended up with lowering PID_MAX (BANG_MAX) from 255 to 150 follwed by PID tuning. This prevents the nozzle from heating up too fast. The overshoot has vanished only leaving a small amount of undershoot at the beginning at the cost of some increased heating time. This is still not what I experienced with my Ender 3 Pro which has a much uncomplicated PID behaviour.
 
 BTW: I have also measured the resistance of the heating cartridge to be sure to have a 24V version installed. Some folks reported the same problem because of using a 12V version in a 24V system. The resistance is around 15 Ohms. This is well within the bounds of a 24V/40W heating cartridge.
 
