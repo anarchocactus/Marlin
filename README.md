@@ -2,6 +2,15 @@
 
 NOTE and DISCLAIMER: This is a fork just for maintaining configurations. There will most certainly never be any code changes. USE THIS CONFIGURATION AT YOUR OWN RISK!
 
+## Reasons for going with Marlin
+
+* The original firmware appears to be some kind of hacked Repetier. Hacked because Repetier officially does not support the MKS Robin Nano boards. It even appears not to be up to date
+* I like to be in control of some aspects. The original firmware is closed-source. The only configuration is possible with a txt-file giving restricted possibilities for customization. I don't like to depend on the manufacturers good will on firmware issues
+* All the benefits of having a great community that permanently fixes bugs
+* the communication with Octoprint gvies me frequent timeouts with loss of communication even at conservative 115200 Baud
+* The LCD Menu lacks options I like from Marlin. While using GCODE in terminal is possible it sometimes is pretty cumbersome
+
+
 ## Description
 
 This configuration is based on Q5_nano_v1 taken from the example configurations. If you want to start off from the beginning, keep in mind to use the corresponding branches otherwise your build will fail in the best case or behave strangely. So if you use the bugfix branch for Marlin also use the bugfix branch for the configurations.
@@ -31,9 +40,17 @@ The entire calibration now works as follows (at least for me):
 
 To double check, Home axis and then move z to zero.
 
-### Auto Bed Leveling with UBL
+### Auto Bed Leveling with Bilinear or UBL
 
 Work in progress
+
+### PID Tuning (Extruder)
+
+With stock settings I could not get a stable temperature on the nozzle. It was over- and undershooting by about 5 to 10&deg;C even after numerous attempts of PID tuning. This is also the case with the original firmware. I did experiments with some values of PID_FUNCTIONAL_RANGE but larger values than the default of 10 only gave me more over-/undershoot apparently due to integral windup as explained here: https://reprap.org/forum/read.php?4,369867
+
+After some more research and experiments I ended up with lowering PID_MAX (BAG_MAX) from 255 to 150 follwed by PID tuning. The overshoot has vanished only leaving a small amount of undershoot at the beginning at the cost of some increased heating time. This is still not what I experienced with my Ender 3 Pro which has a much uncomplicated PID behaviour.
+
+BTW: I have also measured the resistance of the heating cartridge to be sure to have a 24V version installed. Some folks reported the same problem because of using a 12V version in a 24V system. The resistance is around 15 Ohms. This is well within the bounds of a 24V/40W heating cartridge.
 
 ### Futher problems
 
