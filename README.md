@@ -5,7 +5,7 @@ NOTE and DISCLAIMER: This is a fork just for maintaining configurations. There w
 ## Reasons for going with Marlin
 
 * The original firmware appears to be some kind of hacked Repetier. Hacked because Repetier officially does not support the MKS Robin Nano boards. It even appears not to be up to date
-* I like to be in control of some aspects. The original firmware is closed-source. The only configuration is possible with a txt-file giving restricted possibilities for customization. I don't like to depend on the manufacturers good will on firmware issues
+* I like to be in control of some aspects. The original firmware is closed-source. The only configuration is possible with a txt-file giving restricted possibilities for customization
 * All the benefits of having a great community that permanently fixes bugs
 * the communication with Octoprint gvies me frequent timeouts with loss of communication even at conservative 115200 Baud
 * The LCD Menu lacks options I like from Marlin. While using GCODE in terminal is possible it sometimes is pretty cumbersome
@@ -21,6 +21,8 @@ There are also custom E-Steps and maybe some other specifics that may not apply 
 
 ### Calibration
 
+Calibration is something FLSUN has not provided for in their LCD menu. For the noral user they rather appear to rely on the values that are manually configurable in the robin_nano_config file or even hard-coded defaults in the firmware. The first steps instructions do not trigger calibration but rather auto-leveling which is a difference.
+
 While the calibration can be triggered by the corresponding menu item the neccessary adjustment of the probe offset is a very manual process. To the rescue comes the Probe Offset Wizard that can be enabled. The calibration process would then roughly resemble the one in the original firmware.
 There is however one major problem: When using the Wizard it does not disable soft endstops so you cannot adjust z below zero. I have filed a bug for it (https://github.com/MarlinFirmware/Marlin/issues/20848)
 
@@ -28,7 +30,7 @@ But there is a workaround by manually setting M211 S0 and/or by enabling a corre
 
 The entire calibration now works as follows (at least for me):
 
-1. Start the calibration process (config/delta calibration/auto calibration) with the probe mounted. This takes pretty long compared to the original firmware as Marlin goes through seven iterations when doing it for the first time
+1. Start the calibration process (config/delta calibration/auto calibration) with the probe mounted. This takes pretty long as Marlin goes through up to seven iterations when doing it for the first time
 2. When finished, store settings
 3. Disable soft endstops
 4. Start the Probe Offset Wizard (advanced settings) still with the probe mounted
@@ -38,11 +40,11 @@ The entire calibration now works as follows (at least for me):
 8. Enable soft endstops
 9. The new probe z offset should be now visible in both the configuration and advanced settings/probe offset
 
-To double check, Home axis and then move z to zero.
+To double check, Home axis and then move z to zero. If the distance is incorrect manually adjust probe offset by small amounts and recheck.
 
 ### Auto Bed Leveling with Bilinear or UBL
 
-Work in progress
+First tests show that bilinear leveling is working well but UBL does not. I will need to work a bit more on this
 
 ### PID Tuning (Extruder)
 
@@ -52,10 +54,9 @@ After some more research and experiments I ended up with lowering PID_MAX (BAG_M
 
 BTW: I have also measured the resistance of the heating cartridge to be sure to have a 24V version installed. Some folks reported the same problem because of using a 12V version in a 24V system. The resistance is around 15 Ohms. This is well within the bounds of a 24V/40W heating cartridge.
 
-### Futher problems
+### Known problems
 
 * I noticed that the touch screen freezes when using "Restore Defaults" or sending GCODE M502. I filed a bug for that as well: https://github.com/MarlinFirmware/Marlin/issues/20849
-* I have a temperature over- and undershot when setting the nozzles temperature
 * There are some minor GUI glitches like cut-off strings and wild pixels when moving axis but nothing dramatical
 
 
