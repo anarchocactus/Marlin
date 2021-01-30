@@ -8,6 +8,7 @@ NOTE and DISCLAIMER: This is a fork just for maintaining configurations. There w
 * I like to be in control of some aspects. The original firmware is closed-source. The only configuration is possible with a txt-file giving restricted possibilities for customization
 * All the benefits of having a great community that permanently fixes bugs
 * the communication with Octoprint gvies me frequent timeouts with loss of communication even at conservative 115200 Baud
+* Auto-Leveling stops after the first probe when ocoprint is connected
 * The LCD Menu lacks options I like from Marlin. While using GCODE in terminal is possible it sometimes is pretty cumbersome
 
 
@@ -19,21 +20,17 @@ I did some minor configuration tweaks to get the touch screen going. I went for 
 
 There are also custom E-Steps and maybe some other specifics that may not apply to your printer. So please carefully review and understand the settings to avoid damage. If in doubt make a diff against the example configuration mentioned above. As for now there should be no problems when using this configuration as-is. But always mind the disclaimer!
 
-### Calibration
+### Setup and Calibration
 
-Calibration is something FLSUN has not provided for in their LCD menu. For the "normal" user they rather appear to rely on the values that are manually configurable in the robin_nano_config file or even hard-coded defaults in the firmware. The first steps instructions do not trigger calibration but rather auto-leveling. This a difference and can be easily confused, as it happened to me as I had no experience with Delta printers before.
+The first step should be to set the correct Z probe offset. Adjustment of the probe offset is a very manual process. To the rescue comes the Probe Offset Wizard that can be enabled in the firmware and then can be used from the LCD.
+There is however one major problem: When using the Wizard it does not disable soft endstops so you cannot adjust z below zero. I have filed a bug for it (https://github.com/MarlinFirmware/Marlin/issues/20848). But there is a workaround by manually setting M211 S0 and/or by enabling a corresponing menu item in the firmware und using that for triggering soft endstops. Be careful what you do as there is good chance to crash the nozzle into the bed by accident when using the touch screen!
 
-While the calibration can be triggered by the corresponding menu item the neccessary adjustment of the probe offset is a very manual process. To the rescue comes the Probe Offset Wizard that can be enabled. The calibration process would then roughly resemble the one in the original firmware.
-There is however one major problem: When using the Wizard it does not disable soft endstops so you cannot adjust z below zero. I have filed a bug for it (https://github.com/MarlinFirmware/Marlin/issues/20848)
+Setting the Z probe offset works as follows (at least for me):
 
-But there is a workaround by manually setting M211 S0 and/or by enabling a corresponing menu item in the firmware und using that for triggering soft endstops. Be careful what you do as there is good chance to crash the nozzle into the bed by accident when using the touch screen! Also note NOZZLE_TO_PROBE_OFFSET setting in configuration.h. Default is -18 and should be save for a stock printer. -19.75 reduces the distance between nozzle and bed. This is the setting that must be ajusted after auto calibration.
-
-The entire calibration now works as follows (at least for me):
-
-1. Start the calibration process (config/delta calibration/auto calibration) with the probe mounted. This takes pretty long as Marlin goes through up to seven iterations when doing it for the first time
-2. When finished, store settings
+1. If neccessary, auto-home otherwise you will not be able to mount the probe if the nozzle is too close to the bed
+2. Mount the probe
 3. Disable soft endstops
-4. Start the Probe Offset Wizard (advanced settings) still with the probe mounted
+4. Start the Probe Offset Wizard (advanced settings)
 5. Remove the probe after z reference probing (be careful not to move the print head)
 6. Dial in the probe z offset using paper or feeler gauge or something
 7. When finished, store settings
@@ -42,9 +39,21 @@ The entire calibration now works as follows (at least for me):
 
 To double check, Home axis and then move z to zero. If the distance is incorrect manually adjust probe offset by small amounts and recheck.
 
+After that, you can execute the Delta Calibration procedure.
+
 ### Auto Bed Leveling with Bilinear or UBL
 
-First tests show that bilinear leveling is working well but UBL does not. I will need to work a bit more on this
+There is a interesting article about auto-leveling on Delta printers: https://hennerley.wordpress.com/2018/01/29/g29-vs-g33/
+
+The short summary is: Delta beds are usually fixed and not that prone to warping and/or tilting. If your bed is not warped/tilted then there is no need for additional load through ABL.
+
+Good news first: Both, ABL and UBL, work.
+
+My bed appears to be slightly tilted as identified by printing a 100mm 1-layer disc in the middle of the bed. So I tried bilinear ABL with GRID_MAX_POINTS_X 5. The first layer is better than without ABL but not perfect as the nozzle is a bit too close to the bed in some regions. Maybe it is not just tilt but also a bit of warp.
+
+As UBL is supposed to be the superior method for bed leveling, I tried that as well. I used the procedure as described in https://marlinfw.org/docs/gcode/G029-ubl.html including the last step for probing for tilt. Differences between ABL and UBL are for me hardly noticable at first sight. Both tend to move the nozzle too close to the bed, so I have to re-adjust Z probe offset for using any of the two methods.
+
+**Update: At the moment I use the printer without any ABL/UBL enabled and I am quite satisfied with it. Instead I have put much effort in having a exact Z probe offset dialed in.**
 
 ### PID Tuning (Extruder)
 
@@ -54,10 +63,12 @@ After some more research and experiments I ended up with lowering PID_MAX (BANG_
 
 BTW: I have also measured the resistance of the heating cartridge to be sure to have a 24V version installed. Some folks reported the same problem because of using a 12V version in a 24V system. The resistance is around 15 Ohms. This is well within the bounds of a 24V/40W heating cartridge.
 
-### Known problems
+**Update: I got some hints that maybe my heater and/or thermistor is not working like they are supposed to do. So I may have to invest some more work into the strange heating behaviour to get that sorted out.**
+
+### Known issues
 
 * I noticed that the touch screen freezes when using "Restore Defaults" or sending GCODE M502. I filed a bug for that as well: https://github.com/MarlinFirmware/Marlin/issues/20849
-* There are some minor GUI glitches like cut-off strings and wild pixels when moving axis but nothing dramatical
+* There are some minor GUI glitches like cut-off strings and wild pixels when moving axis but nothing to really write home about
 
 
 
