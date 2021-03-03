@@ -1,4 +1,4 @@
-# Fork for FLSUN Q5 (stock)
+# Fork for FLSUN Q5 (modified hardware)
 
 NOTE and DISCLAIMER: This is a fork just for maintaining configurations. There will most certainly never be any code changes. USE THIS CONFIGURATION AT YOUR OWN RISK!
 
@@ -12,6 +12,29 @@ NOTE and DISCLAIMER: This is a fork just for maintaining configurations. There w
 * The LCD Menu lacks options I like from Marlin. While using GCODE in terminal is possible it sometimes is pretty cumbersome
 
 
+## Hardware modifications
+
+Through the process of tuning the firmware I have discovered some problems mentioned below and things to optimize. A good source for parts is the Trianglelab shop on Aliexpress. That's is what I have changed:
+
+* 40W Heater cartridge
+* Thermistor (with cartridge. No more flimmsy glas thingy)
+* E3D heating block (clone)
+* Silicone sock
+
+These three really work well together. the heatbreak I left stock. For the new thermistor I had to change the type in the firmware. The heating block with the silicone sock exactly fits between the probe mount and the part cooler. Note that the new heating block is a bit shorter in height so the part cooling may be compromised. I still have to investigate for myself, but no real problems so far.
+
+* BMG (clone) Dual Drive Extruder. The original is not that bad and there is no real need for exchange unless you plan to print with special materials
+* Bowden tube. The original is very stiff and leaves too much room for the filament. Note: when replacing the bowden tube be aware of the proper length and the movement during printing. Especially during homing it can happen that the bowden tube get stuck on the opposite side of where the endstops are between the upper part of the printer and the moving part. This can give you all kinds of strange problems like "M112 shutdown" errors during delta calibration etc.
+
+After some printing I experienced severe adhesion problems with the stock bed that even did not go away with very exact levelling and the usual cleaning with high pecentage iso alcohol.  There are some hints on the internet to clean the surface with soap and all kinds of strange recipies.
+
+* 1mm Pertinax mounted with thin 3M-Tape. I use this combination successfully on my Ender 3 Pro. It needs to be sandpapered from time to time and regulary cleaned with iso alcohol
+
+The noise coming from the extruder stepper drivers (A4988) was driving me nuts. I thought of just replacing it with a spare TMC2208 but then found out that while they are great for the axes they may not be the best choice for extruders due to torque and heat. I then went for a
+
+* TMC2209 with a calculated Vref of 1.061V. Not that you can adjust E0_DRIVER_TYPE for optimized operation and may have to invert direction
+
+
 ## Description
 
 This configuration is based on Q5_nano_v1 taken from the example configurations. If you want to start off from the beginning, keep in mind to use the corresponding branches otherwise your build will fail in the best case or behave strangely. So if you use the bugfix branch for Marlin also use the bugfix branch for the configurations.
@@ -22,7 +45,9 @@ There are also custom E-Steps and maybe some other specifics that may not apply 
 
 ### Setup and Calibration
 
-The first step should be to set the correct Z probe offset. Adjustment of the probe offset is a very manual process. To the rescue comes the Probe Offset Wizard that can be enabled in the firmware and then can be used from the LCD.
+First, execute the Delta Calbration, either by using the menu item or manually (G33). This takes some time as the calibration process goes through up to 7 iterations.
+
+The next step should be to set the correct Z probe offset. Adjustment of the probe offset is a very manual process. To the rescue comes the Probe Offset Wizard that can be enabled in the firmware and then can be used from the LCD.
 There is however one major problem: When using the Wizard it does not disable soft endstops so you cannot adjust z below zero. I have filed a bug for it (https://github.com/MarlinFirmware/Marlin/issues/20848). But there is a workaround by manually setting M211 S0 and/or by enabling a corresponing menu item in the firmware und using that for triggering soft endstops. Be careful what you do as there is good chance to crash the nozzle into the bed by accident when using the touch screen!
 
 Setting the Z probe offset works as follows (at least for me):
@@ -39,19 +64,20 @@ Setting the Z probe offset works as follows (at least for me):
 
 To double check, Home axis and then move z to zero. If the distance is incorrect manually adjust probe offset by small amounts and recheck.
 
-After that, you can execute the Delta Calibration procedure.
+Hint: after some time of inactivity the wizard returns to the main menu ans resets the offset to some default value. So don't waste your time ;-)
+
 
 ### Auto Bed Leveling with Bilinear or UBL
 
 There is a interesting article about auto-leveling on Delta printers: https://hennerley.wordpress.com/2018/01/29/g29-vs-g33/
 
-The short summary is: Delta beds are usually fixed and not that prone to warping and/or tilting. If your bed is not warped/tilted then there is no need for additional load through ABL.
+The short summary is: Delta beds are usually fixed and not that prone to warping and/or tilting. If your bed is not warped/tilted then there is no need for additional load through ABL/UBL.
 
 Good news first: Both, ABL and UBL, work.
 
 My bed appears to be slightly tilted as identified by printing a 100mm 1-layer disc in the middle of the bed. So I tried bilinear ABL with GRID_MAX_POINTS_X 5. The first layer is better than without ABL but not perfect as the nozzle is a bit too close to the bed in some regions. Maybe it is not just tilt but also a bit of warp.
 
-As UBL is supposed to be the superior method for bed leveling, I tried that as well. I used the procedure as described in https://marlinfw.org/docs/gcode/G029-ubl.html including the last step for probing for tilt. Differences between ABL and UBL are for me hardly noticable at first sight. Both tend to move the nozzle too close to the bed, so I have to re-adjust Z probe offset for using any of the two methods.
+Keep in mind that using ABL/UBL introduces dimensional inaccuracy in the Z axis. The printed parts may lose about more than 0.1mm in height. To compensate for it appeared nearly impossible to me as that would mean to move the nozzle further from the bed which in turn means loss of bed adhesion at some point.
 
 **Update: At the moment I use the printer without any ABL/UBL enabled and I am quite satisfied with it. Instead I have put much effort in having a exact Z probe offset dialed in.**
 
@@ -63,7 +89,7 @@ After some more research and experiments I ended up with lowering PID_MAX (BANG_
 
 BTW: I have also measured the resistance of the heating cartridge to be sure to have a 24V version installed. Some folks reported the same problem because of using a 12V version in a 24V system. The resistance is around 15 Ohms. This is well within the bounds of a 24V/40W heating cartridge.
 
-**Update: I got some hints that maybe my heater and/or thermistor is not working like they are supposed to do. So I may have to invest some more work into the strange heating behaviour to get that sorted out.**
+**Update: I have replaced the heater cartridge and the thermistor giving me the same problems. I then replaced the heating block with a standard E3D-Clone. I suspect that with the original heading block there was no proper contact between the heating cartridge and the block. Since then I experience only minor overshoot in a range of being normal**
 
 ### Known issues
 
